@@ -1,5 +1,6 @@
 package run.halo.app.core.freemarker.tag;
 
+import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import freemarker.core.Environment;
@@ -15,6 +16,7 @@ import java.util.Map;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.support.ExtendedConst;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
@@ -50,8 +52,10 @@ public class TagTagDirective implements TemplateDirectiveModel {
             String method = params.get(HaloConst.METHOD_KEY).toString();
             switch (method) {
                 case "list":
-                    env.setVariable("tags", builder.build()
-                        .wrap(postTagService.listTagWithCountDtos(Sort.by(DESC, "createTime"))));
+                    String sort = params.get(ExtendedConst.SORT).toString();
+                    env.setVariable("tags", builder.build().wrap(postTagService
+                        .listTagWithCountDtos(Sort.by("desc".equals(sort) ? DESC : ASC,
+                            "createTime"))));
                     break;
                 case "listByPostId":
                     Integer postId = Integer.parseInt(params.get("postId").toString());
