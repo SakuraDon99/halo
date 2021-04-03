@@ -1,0 +1,23 @@
+trigger:
+- master
+
+resources:
+- repo: self
+
+stages:
+- stage: Build
+  displayName: Build image and push
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'registry.ap-northeast-1.aliyuncs.com(Tokyo)'
+        repository: 'sakuradon/halo'
+        command: 'buildAndPush'
+        Dockerfile: './ci/Dockerfile'
+        buildContext: '.'
+        tags: '$(Build.BuildNumber)'
