@@ -52,7 +52,8 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
             String method = params.get(HaloConst.METHOD_KEY).toString();
             switch (method) {
                 case "list":
-                    String sort = params.get(ExtendedConst.SORT).toString();
+                    String sort = params.get(ExtendedConst.SORT) == null ? "desc" :
+                        params.get(ExtendedConst.SORT).toString();
                     env.setVariable("categories", builder.build().wrap(postCategoryService
                         .listCategoryWithPostCountDto(Sort.by("desc".equals(sort) ? DESC : ASC,
                             "createTime"), false)));

@@ -52,7 +52,8 @@ public class TagTagDirective implements TemplateDirectiveModel {
             String method = params.get(HaloConst.METHOD_KEY).toString();
             switch (method) {
                 case "list":
-                    String sort = params.get(ExtendedConst.SORT).toString();
+                    String sort = params.get(ExtendedConst.SORT) == null ? "desc" :
+                        params.get(ExtendedConst.SORT).toString();
                     env.setVariable("tags", builder.build().wrap(postTagService
                         .listTagWithCountDtos(Sort.by("desc".equals(sort) ? DESC : ASC,
                             "createTime"))));
