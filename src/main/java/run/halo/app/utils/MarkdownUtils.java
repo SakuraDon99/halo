@@ -26,8 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.support.HaloConst;
+import run.halo.app.utils.footnotes.FootnoteExtension;
 
 /**
  * Markdown utils.
@@ -50,6 +52,7 @@ public class MarkdownUtils {
             TocExtension.create(),
             SuperscriptExtension.create(),
             YamlFrontMatterExtension.create(),
+            FootnoteExtension.create(),
             GitLabExtension.create()))
             .set(TocExtension.LEVELS, 255)
             .set(TablesExtension.WITH_CAPTION, false)
@@ -62,7 +65,8 @@ public class MarkdownUtils {
             .set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
             .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.EMOJI_CHEAT_SHEET)
             .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.UNICODE_ONLY)
-            .set(HtmlRenderer.SOFT_BREAK, "<br />\n");
+            .set(HtmlRenderer.SOFT_BREAK, "<br />\n")
+            .set(FootnoteExtension.FOOTNOTE_BACK_REF_STRING, "↩︎");
 
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
 
@@ -120,6 +124,18 @@ public class MarkdownUtils {
      * @return Map
      */
     public static Map<String, List<String>> getFrontMatter(String markdown) {
+        markdown = markdown.trim();
+        Matcher matcher = FRONT_MATTER.matcher(markdown);
+        if (matcher.find()) {
+            markdown = matcher.group();
+        }
+        markdown = Arrays.stream(markdown.split("\\r?\\n")).map(row -> {
+            if (row.startsWith("- ")) {
+                return " " + row;
+            } else {
+                return row;
+            }
+        }).collect(Collectors.joining("\n"));
         AbstractYamlFrontMatterVisitor visitor = new AbstractYamlFrontMatterVisitor();
         Node document = PARSER.parse(markdown);
         visitor.visit(document);
